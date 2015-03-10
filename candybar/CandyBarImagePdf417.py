@@ -2,34 +2,41 @@ import Image
 import ImageDraw
 import cStringIO
 
+# TODO imaging works but looks a little wanky
 
-class CandyBarImage:
-    width = 400
-    height = 60
+class CandyBarImagePdf417:
+
+    width = 120
+    height = 500
+    module_width = 2
+    module_height = 6
     image_byte_array = []
     image_type = "PNG"
-    current_position = 0
+    current_x = 2
+    current_y = 0
     image = None
     draw = None
 
-    def __init__(self, width, height):
-        self.width = width
-        self.height = height
+    def __init__(self, columns, rows):
+        self.width = (columns*17+1+4)*self.module_width
+        self.height = rows * self.module_height
         self.setup()
 
     def setup(self):
         self.image = Image.new('RGBA', (self.width, self.height), 'white')
         self.draw = ImageDraw.Draw(self.image)
 
-    def add_bar(self, bar_width):
-        d = (self.current_position, 0, self.current_position + bar_width, self.height + 1)
-        self.draw.rectangle(d, 'black')
-        self.current_position += bar_width
+    def add_module(self, is_black):
+        color = 'black' if is_black else 'white'
+        d = (self.current_x, self.current_y,
+             self.current_x + self.module_width, self.current_y + self.module_height)
+        self.draw.rectangle(d, color)
+        self.current_x += self.module_width
 
-    def add_space(self, space_width):
-        d = (self.current_position, 0, self.current_position + space_width, self.height + 1)
-        self.draw.rectangle(d, 'white')
-        self.current_position += space_width
+    def new_row(self):
+        self.current_x = 2
+        self.current_y += self.module_height
+
 
     def rescale(self, scaled_width, scaled_height):
         return self.image.resize((scaled_width, scaled_height), Image.NEAREST)
