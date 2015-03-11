@@ -12,14 +12,30 @@ class CandyBarPdf417:
     def encode(self, contents):
 
         # high level encoding of contents
-        contents_list = list(contents)
-        current_mode = "UPP"
-        if (len(contents_list) % 2) > 0:
-            contents_list.append("T_PUN")
+        # half code_words
+        # pad for even
+        # build code words
+
+        codes = []
+        current_sub_mode = PatternPdf417.START_SUBMODE
+        for c in list(contents):
+            if c not in PatternPdf417.SUBMODE_MAP[current_sub_mode]:
+                for check_sub_mode, charset in PatternPdf417.SUBMODE_MAP.iteritems():
+                    if c in charset:
+                        if check_sub_mode != current_sub_mode:
+                            for sub_mode, latch in PatternPdf417.SUBMODE_TRANSITIONS[current_sub_mode+"_"+check_sub_mode]:
+                                codes.append(PatternPdf417.SUBMODE_MAP[sub_mode][latch])
+                            current_sub_mode = check_sub_mode
+            codes.append(PatternPdf417.SUBMODE_MAP[current_sub_mode][c])
+
+        # round length to even
+        if (len(codes) % 2) > 0:
+            codes.append(PatternPdf417.CHARACTER_PAD)
         code_words = []
+        # we'll store the cw length here after we add padding
         code_words.append(0)
-        for i in xrange(0, len(contents_list), 2):
-            value = PatternPdf417.get_code_word_value(contents_list[i], contents_list[i + 1])
+        for i in xrange(0, len(codes), 2):
+            value = PatternPdf417.get_code_word_value(codes[i], codes[i + 1])
             code_words.append(value)
 
         # calculate security level and cw length for error correction

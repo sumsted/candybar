@@ -2,19 +2,58 @@
 # TODO add tests
 
 class PatternPdf417:
-    PDF417_UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ "
-    PDF417_LOWER = "abcdefghijklmnopqrstuvwxyz "
-    PDF417_MIXED = "0123456789&,:#-.$/+%*=^ "
-    PDF417_PUNCTUATION = ";<>@[\\]_'\"~!,:=.$/g|*()?{}`"
+    START_SUBMODE = "ALPHA"
     START_PATTERN = "11111111010101000"
     STOP_PATTERN = "111111101000101001"
+    CHARACTER_PAD = 29
     DATA_WORD_PAD = 900
-    UPPER_MAP = {
-        "A": 0, "B": 1, "C": 2, "D": 3, "E": 4, "F": 5,
-        "G": 6, "H": 7, "I": 8, "J": 9, "K": 10, "L": 11,
-        "M": 12, "N": 13, "O": 14, "P": 15, "Q": 16, "R": 17,
-        "S": 18, "T": 19, "U": 20, "V": 21, "W": 22, "X": 23,
-        "Y": 24, "Z": 25, " ": 26, "LOW": 27, "MIX": 28, "T_PUN": 29}
+    SUBMODE_MAP = {
+        "ALPHA": {
+            "A": 0, "B": 1, "C": 2, "D": 3, "E": 4, "F": 5,
+            "G": 6, "H": 7, "I": 8, "J": 9, "K": 10, "L": 11,
+            "M": 12, "N": 13, "O": 14, "P": 15, "Q": 16, "R": 17,
+            "S": 18, "T": 19, "U": 20, "V": 21, "W": 22, "X": 23,
+            "Y": 24, "Z": 25, " ": 26, "LL": 27, "ML": 28, "PS": 29},
+        "LOWER": {
+            "a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5,
+            "g": 6, "h": 7, "i": 8, "j": 9, "k": 10, "l": 11,
+            "m": 12, "n": 13, "o": 14, "p": 15, "q": 16, "r": 17,
+            "s": 18, "t": 19, "u": 20, "v": 21, "w": 22, "x": 23,
+            "y": 24, "z": 25, " ": 26, "AS": 27, "ML": 28, "PS": 29
+        },
+        "MIXED": {
+            "0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5,
+            "6": 6, "7": 7, "8": 8, "9": 9, "&": 10, "\r": 11,
+            "\t": 12, ",": 13, ":": 14, "#": 15, "-": 16, ".": 17,
+            "$": 18, "/": 19, "+": 20, "%": 21, "*": 22, "=": 23,
+            "^": 24, "PL": 25, " ": 26, "LL": 27, "AL": 28, "PS": 29
+        },
+        "PUNCTUATION": {
+            ";": 0, "<": 1, ">": 2, "@": 3, "[": 4, "\\": 5,
+            "]": 6, "_": 7, "`": 8, "~": 9, "!": 10, "\r": 11,
+            "\t": 12, ",": 13, ":": 14, "\n": 15, "-": 16, ".": 17,
+            "$": 18, "/": 19, "\"": 20, "|": 21, "*": 22, "(": 23,
+            ")": 24, "?": 25, "{": 26, "}": 27, "'": 28, "AL": 29
+        }
+    }
+    SUBMODE_TRANSITIONS = {
+        "ALPHA_ALPHA": [],
+        "ALPHA_LOWER": [("ALPHA", "LL")],
+        "ALPHA_MIXED": [("ALPHA", "ML")],
+        "ALPHA_PUNCTUATION": [("ALPHA", "ML"), ("MIXED", "PL")],
+        "LOWER_ALPHA": [("LOWER", "ML"), ("MIXED", "AL")],
+        "LOWER_LOWER": [],
+        "LOWER_MIXED": [("LOWER", "ML")],
+        "LOWER_PUNCTUATION": [("LOWER", "ML"), ("MIXED", "PL")],
+        "MIXED_ALPHA": [("MIXED", "AL")],
+        "MIXED_LOWER": [("MIXED", "LL")],
+        "MIXED_MIXED": [],
+        "MIXED_PUNCTUATION": [("MIXED", "PL")],
+        "PUNCTUATION_ALPHA": [("PUNCTUATION", "AL")],
+        "PUNCTUATION_LOWER": [("PUNCTUATION", "AL"), ("ALPHA", "LL")],
+        "PUNCTUATION_MIXED": [("PUNCTUATION", "AL"), ("ALPHA", "ML")],
+        "PUNCTUATION_PUNCTUATION": []
+    }
     PATTERN_MAP = (
         (
             "11101010111000000", "11110101011110000", "11111010101111100", "11101010011100000",
@@ -740,8 +779,8 @@ class PatternPdf417:
         return PatternPdf417.PATTERN_MAP[(row % 3)][key]
 
     @staticmethod
-    def get_code_word_value(first, second):
-        return PatternPdf417.UPPER_MAP[first] * 30 + PatternPdf417.UPPER_MAP[second]
+    def get_code_word_value(high, low):
+        return high * 30 + low
 
     @staticmethod
     def map_pair(row, first, second):
