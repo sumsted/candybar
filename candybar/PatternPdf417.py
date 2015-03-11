@@ -6,7 +6,7 @@ class PatternPdf417:
     START_PATTERN = "11111111010101000"
     STOP_PATTERN = "111111101000101001"
     CHARACTER_PAD = 29
-    DATA_WORD_PAD = 900
+    CODE_WORD_PAD = 900
     SUBMODE_MAP = {
         "ALPHA": {
             "A": 0, "B": 1, "C": 2, "D": 3, "E": 4, "F": 5,
