@@ -4,5 +4,5 @@ Barcode generator written in Python. Supports Code128 and PDF417 now, Code39 lat
 ![Code128](/tests/test1.png)
 
 ### PDF417
-Only text mode and upper submode are supported. Will add mode transitions soon.
+Text mode and all sub-modes are supported.
 ![PDF417](/tests/test_pdf_417_1.png)

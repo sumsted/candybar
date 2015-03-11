@@ -31,7 +31,7 @@ class TestCandyBarPdf417(TestCase):
         file_written = False
         pdf417 = CandyBarPdf417()
         bc = pdf417.encode('123 bars times 295 bars EQUALS 36285')
-        of = open('./test_pdf_417_2.png', 'wb')
+        of = open('./test_pdf_417_3.png', 'wb')
         for b in bc:
             of.write('%c' % b)
             file_written = True
@@ -42,7 +42,7 @@ class TestCandyBarPdf417(TestCase):
         file_written = False
         pdf417 = CandyBarPdf417()
         bc = pdf417.encode('123 bars * 295 bars = 36,285')
-        of = open('./test_pdf_417_3.png', 'wb')
+        of = open('./test_pdf_417_4.png', 'wb')
         for b in bc:
             of.write('%c' % b)
             file_written = True
