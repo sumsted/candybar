@@ -1,5 +1,12 @@
 # candybar
-Barcode generator written in Python. Supports Code128 and PDF417 now, Code39 later.
+Python barcode generator. Supports Code128 and PDF417 now, Code39 later.
+
+Ported to Python 3.4
+
+```
+Pillow==2.8.1
+```
+
 ### Code128
 ![Code128](/tests/test1.png)
 

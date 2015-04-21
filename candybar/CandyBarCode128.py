@@ -1,4 +1,4 @@
-from CandyBarImage import CandyBarImage
+from candybar.CandyBarImage import CandyBarImage
 
 
 class CandyBar128:

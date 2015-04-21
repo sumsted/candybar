@@ -11,7 +11,7 @@ class TestCandyBarPdf417(TestCase):
         m = hashlib.sha224()
         for b in bs:
             m.update(b)
-        print m.hexdigest()
+        print(m.hexdigest())
         return m.hexdigest()
 
     @staticmethod

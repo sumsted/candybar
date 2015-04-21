@@ -1,6 +1,6 @@
-import Image
-import ImageDraw
-import cStringIO
+from PIL import Image
+from PIL import ImageDraw
+import io
 
 # TODO imaging works but looks a little wanky
 
@@ -49,7 +49,7 @@ class CandyBarImagePdf417:
         return self.image_byte_array
 
     def _convert(self, render_image):
-        fp = cStringIO.StringIO()
+        fp = io.BytesIO()
         render_image.save(fp, self.image_type)
         iba = fp.getvalue()
         fp.close()
