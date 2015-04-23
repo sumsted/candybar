@@ -129,7 +129,7 @@ class CandyBar39:
 
     def generate_barcode(self):
         self.reset()
-        self.determine_type()
+        #self.determine_type()
         self.create_bar_elements()
         self.translate_to_image()
         return self.image_byte_array
@@ -150,32 +150,36 @@ class CandyBar39:
     def add_module(self, weights):
         i = 1
         for w in weights:
-            self.bar_elements.append({'width': int(w), 'flip': (i % 2)})
+            self.bar_elements.append({'width': int(w+1), 'flip': (i % 2)})
             i += 1
 
     def add_quiet(self):
         self.bar_elements.append({'width': self.quiet, 'flip': 0})
 
     def get_pattern(self, s):
-        if self.pattern_type == 'A':
-            return self.pattern_128[self.pattern_128A[s]]
-        elif self.pattern_type == 'B':
-            return self.pattern_128[self.pattern_128B[s]]
-        else:
-            return self.pattern_128[self.pattern_128B[s]]
+        return self.code_39_characters[self.pattern_39[s]]
+
+        # if self.pattern_type == 'A':
+        #     return self.pattern_128[self.pattern_128A[s]]
+        # elif self.pattern_type == 'B':
+        #     return self.pattern_128[self.pattern_128B[s]]
+        # else:
+        #     return self.pattern_128[self.pattern_128B[s]]
 
     def get_index(self, s):
-        if self.pattern_type == 'A':
-            return self.pattern_128A[s]
-        elif self.pattern_type == 'B':
-            return self.pattern_128B[s]
-        else:
-            return self.pattern_128B[s]
+        return self.pattern_39[s]
+
+        # if self.pattern_type == 'A':
+        #     return self.pattern_128A[s]
+        # elif self.pattern_type == 'B':
+        #     return self.pattern_128B[s]
+        # else:
+        #     return self.pattern_128B[s]
 
     def encode_module(self, s, mw):
         pattern = self.get_pattern(s)
         self.add_module(pattern)
-        self.mod_sum += mw * self.get_index(s)
+        #self.mod_sum += mw * self.get_index(s)
 
     def add_mod(self):
         remainder = self.mod_sum % 103
@@ -184,13 +188,13 @@ class CandyBar39:
 
     def create_bar_elements(self):
         self.add_quiet()
-        self.encode_module("Start", 1)
+        self.encode_module("*", 1)
         i = 1
         for c in self.contents:
             self.encode_module(c, i)
             i += 1
         self.add_mod()
-        self.encode_module("Stop", 0)
+        self.encode_module("*", 0)
         self.add_quiet()
 
     def translate_to_image(self):

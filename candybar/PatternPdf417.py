@@ -810,7 +810,7 @@ class PatternPdf417:
         correction_words = [0] * k
         for cw in code_words:
             t = (cw + correction_words[k - 1]) % 929
-            for j in reversed(xrange(k)):
+            for j in reversed(range(k)):
                 if j == 0:
                     correction_words[j] = \
                         ((929 - (t * PatternPdf417.ERROR_COEFFICIENTS[security_level][j]) % 929) % 929)
@@ -818,7 +818,7 @@ class PatternPdf417:
                     correction_words[j] = \
                         (correction_words[j - 1] + 929 -
                          (t * PatternPdf417.ERROR_COEFFICIENTS[security_level][j]) % 929) % 929
-        for j in xrange(k):
+        for j in range(k):
             if correction_words[j] != 0:
                 correction_words[j] = 929 - correction_words[j]
         correction_words.reverse()
@@ -826,24 +826,26 @@ class PatternPdf417:
 
     @staticmethod
     def get_left(security_level, current_row, total_rows, code_word_length):
-        left = current_row / 3 * 30
+        # todo : research
+        left = current_row // 3 * 30
         table = current_row % 3
         if table == 0:
-            left += (total_rows - 1) / 3
+            left += (total_rows - 1) // 3
         elif table == 1:
             left += (security_level * 3) + (total_rows - 1) % 3
         elif table == 2:
             left += (code_word_length - 1)
-        return left
+        return int(left)
 
     @staticmethod
     def get_right(security_level, current_row, total_rows, code_word_length):
-        right = current_row / 3 * 30
+        # todo: research
+        right = current_row // 3 * 30
         table = current_row % 3
         if table == 0:
             right += (code_word_length - 1)
         elif table == 1:
-            right += (total_rows - 1) / 3
+            right += (total_rows - 1) // 3
         elif table == 2:
             right += (security_level * 3) + (total_rows - 1) % 3
-        return right
+        return int(right)
