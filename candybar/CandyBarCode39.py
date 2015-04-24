@@ -5,7 +5,7 @@ class CandyBar39:
 
     character_pad = "0"
 
-    start_stop_pattern = "010011100"
+    start_stop_pattern = "010010100"
 
     pattern_39 = {
         0: "000111100",
@@ -149,9 +149,10 @@ class CandyBar39:
 
     def add_module(self, weights):
         i = 1
-        for w in weights:
-            self.bar_elements.append({'width': int(w+1), 'flip': (i % 2)})
-            i += 1
+        self.bar_elements.append(weights)
+        # for w in weights:
+            # self.bar_elements.append({'width': int(w)+1, 'flip': (i % 2)})
+            # i += 1
 
     def add_quiet(self):
         self.bar_elements.append({'width': self.quiet, 'flip': 0})
@@ -187,17 +188,41 @@ class CandyBar39:
         self.add_module(pattern)
 
     def create_bar_elements(self):
-        self.add_quiet()
-        self.encode_module("*", 1)
+        # self.add_quiet()
+        # self.encode_module("*", 1)
+        self.add_module(self.start_stop_pattern)
         i = 1
         for c in self.contents:
-            self.encode_module(c, i)
+            self.add_module(self.pattern_39[self.code_39_characters[c]])
+            # self.encode_module(c, i)
             i += 1
-        self.add_mod()
-        self.encode_module("*", 0)
-        self.add_quiet()
+        # self.add_mod()
+        self.add_module(self.start_stop_pattern)
+        # self.encode_module("*", 0)
+        # self.add_quiet()
 
     def translate_to_image(self):
+        all_weights = len(self.bar_elements)*3
+        for p in self.bar_elements:
+            for m in p:
+                all_weights += (int(m)+1)
+        si = CandyBarImage(all_weights, int(all_weights * 0.15))
+        scale = 1
+        si.add_space(2 * scale)
+        for p in self.bar_elements:
+            print(p)
+            black = True
+            for m in p:
+                pixels = (int(m)+1) * scale
+                if black:
+                    si.add_bar(pixels)
+                else:
+                    si.add_space(pixels)
+                black = False if black else True
+            si.add_space(1 * scale)
+        self.image_byte_array = si.scale_and_convert_to_byte_array(self.width, self.height)
+
+    def translate_to_image_old(self):
         all_weights = 0
         for m in self.bar_elements:
             all_weights += m['width']
