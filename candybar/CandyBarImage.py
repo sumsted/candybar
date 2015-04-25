@@ -4,22 +4,18 @@ import io
 
 
 class CandyBarImage:
-    width = 400
-    height = 60
-    image_byte_array = []
-    image_type = "PNG"
-    current_position = 0
-    image = None
-    draw = None
+    DEFAULT_WIDTH = 400
+    DEFAULT_HEIGHT = 60
+    DEFAULT_IMAGE_TYPE = "PNG"
 
-    def __init__(self, width, height):
-        self.width = width
-        self.height = height
-        self.setup()
-
-    def setup(self):
+    def __init__(self, width=None, height=None, image_type=None):
+        self.width = self.DEFAULT_WIDTH if width is None else width
+        self.height = self.DEFAULT_HEIGHT if height is None else height
+        self.image_type = self.DEFAULT_IMAGE_TYPE if image_type is None else image_type
         self.image = Image.new('RGBA', (self.width, self.height), 'white')
         self.draw = ImageDraw.Draw(self.image)
+        self.current_position = 0
+        self.image_byte_array = []
 
     def add_bar(self, bar_width):
         d = (self.current_position, 0, self.current_position + bar_width, self.height + 1)

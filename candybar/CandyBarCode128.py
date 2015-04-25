@@ -2,7 +2,7 @@ from candybar.CandyBarImage import CandyBarImage
 
 
 class CandyBar128:
-    pattern_128 = {
+    PATTERN_128 = {
         0: "212222", 1: "222122", 2: "222221", 3: "121223", 4: "121322", 5: "131222", 6: "122213", 7: "122312",
         8: "132212", 9: "221213",
         10: "221312", 11: "231212", 12: "112232", 13: "122132", 14: "122231", 15: "113222", 16: "123122", 17: "123221",
@@ -27,7 +27,7 @@ class CandyBar128:
         -1: "211133",
     }
 
-    pattern_128A = {
+    PATTERN_128A = {
         " ": 0, "!": 1, "\"": 2, "#": 3, "$": 4, "%": 5, "&": 6, "'": 7, "(": 8, ")": 9,
         "*": 10, "+": 11, ",": 12, "-": 13, ".": 14, "/": 15, "0": 16, "1": 17, "2": 18, "3": 19,
         "4": 20, "5": 21, "6": 22, "7": 23, "8": 24, "9": 25, ":": 26, ";": 27, "<": 28, "=": 29,
@@ -42,7 +42,7 @@ class CandyBar128:
         "Code B": 100, "FNC 4": 101, "FNC 1": 102, "Start": 103, "Stop": 106, "unused": 107,
     }
 
-    pattern_128B = {
+    PATTERN_128B = {
         " ": 0, "!": 1, "\"": 2, "#": 3, "$": 4, "%": 5, "&": 6, "'": 7, "(": 8, ")": 9,
         "*": 10, "+": 11, ",": 12, "-": 13, ".": 14, "/": 15, "0": 16, "1": 17, "2": 18, "3": 19,
         "4": 20, "5": 21, "6": 22, "7": 23, "8": 24, "9": 25, ":": 26, ";": 27, "<": 28, "=": 29,
@@ -59,107 +59,108 @@ class CandyBar128:
     TYPE_A_CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 !\"#$%&'()*+,-./:;<=>?@[\\]^_"
     TYPE_B_CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 !\"#$%&'()*+,-./:;<=>?@[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
 
-    contents = ''
-    width = 400
-    height = 60
-    mod_sum = 0
-    image_type = 'PNG'
-    pattern_type = 'B'
-    bar_elements = []
-    image_byte_array = []
-    quiet = 10
+    DEFAULT_WIDTH = 400
+    DEFAULT_HEIGHT = 60
+    DEFAULT_SCALE = 1
+    IMAGE_TYPE = 'PNG'
+    QUIET_SPACE = 10
 
-    def __init__(self, contents, width, height):
-        self.contents = contents
-        self.width = width
-        self.height = height
+    # pattern_type = 'B'
+    # bar_elements = []
+
+    def __init__(self, contents=None, width=None, height=None, scale=None):
+        self._contents = '' if contents is None else contents
+        self._width = self.DEFAULT_WIDTH if width is None else width
+        self._height = self.DEFAULT_HEIGHT if height is None else height
+        self._scale = self.DEFAULT_SCALE if scale is None else scale
+        self._mod_sum = 0
 
     def reset(self):
-        self.mod_sum = 0
-        self.bar_elements = []
-        self.image_byte_array = []
+        self._mod_sum = 0
 
     def generate_barcode_with_contents(self, contents):
-        self.contents = contents
+        self._contents = contents
         return self.generate_barcode()
 
     def generate_barcode(self):
         self.reset()
-        self.determine_type()
-        self.create_bar_elements()
-        self.translate_to_image()
-        return self.image_byte_array
+        mode = self._determine_mode(self._contents)
+        bar_elements = self._create_bar_elements(self._contents, mode)
+        image_byte_array = self._translate_to_image(bar_elements)
+        return image_byte_array
 
-    def determine_type(self):
-        mode_type = 'A'
-        if len(self.contents) < 1:
+    def _determine_mode(self, contents):
+        mode = 'A'
+        if len(contents) < 1:
             pass
-        for c in self.contents:
-            if mode_type == 'A' and self.TYPE_A_CHARSET.find(c) > -1:
-                mode_type = 'A'
+        for c in contents:
+            if mode == 'A' and self.TYPE_A_CHARSET.find(c) > -1:
+                mode = 'A'
             elif self.TYPE_B_CHARSET.find(c) > -1:
-                mode_type = 'B'
+                mode = 'B'
             else:
                 pass
-        self.pattern_type = mode_type
+        return mode
 
-    def add_module(self, weights):
+    @staticmethod
+    def get_module(weights):
+        bar_elements = []
         i = 1
         for w in weights:
-            self.bar_elements.append({'width': int(w), 'flip': (i % 2)})
+            bar_elements.append({'width': int(w), 'flip': (i % 2)})
             i += 1
+        return bar_elements
 
-    def add_quiet(self):
-        self.bar_elements.append({'width': self.quiet, 'flip': 0})
+    def _get_quiet(self):
+        return {'width': self.QUIET_SPACE, 'flip': 0}
 
-    def get_pattern(self, s):
-        if self.pattern_type == 'A':
-            return self.pattern_128[self.pattern_128A[s]]
-        elif self.pattern_type == 'B':
-            return self.pattern_128[self.pattern_128B[s]]
+    def _get_pattern(self, mode, s):
+        if mode == 'A':
+            return self.PATTERN_128[self.PATTERN_128A[s]]
+        elif mode == 'B':
+            return self.PATTERN_128[self.PATTERN_128B[s]]
         else:
-            return self.pattern_128[self.pattern_128B[s]]
+            return self.PATTERN_128[self.PATTERN_128B[s]]
 
-    def get_index(self, s):
-        if self.pattern_type == 'A':
-            return self.pattern_128A[s]
-        elif self.pattern_type == 'B':
-            return self.pattern_128B[s]
+    def _get_index(self, mode, s):
+        if mode == 'A':
+            return self.PATTERN_128A[s]
+        elif mode == 'B':
+            return self.PATTERN_128B[s]
         else:
-            return self.pattern_128B[s]
+            return self.PATTERN_128B[s]
 
-    def encode_module(self, s, mw):
-        pattern = self.get_pattern(s)
-        self.add_module(pattern)
-        self.mod_sum += mw * self.get_index(s)
+    def _encode_module(self, mode, s, mw):
+        pattern = self._get_pattern(mode, s)
+        self._mod_sum += mw * self._get_index(mode, s)
+        return self.get_module(pattern)
 
-    def add_mod(self):
-        remainder = self.mod_sum % 103
-        pattern = self.pattern_128[remainder]
-        self.add_module(pattern)
+    def _get_mod(self):
+        remainder = self._mod_sum % 103
+        pattern = self.PATTERN_128[remainder]
+        return self.get_module(pattern)
 
-    def create_bar_elements(self):
-        self.add_quiet()
-        self.encode_module("Start", 1)
+    def _create_bar_elements(self, contents, mode):
+        bar_elements = [self._get_quiet()]
+        bar_elements.extend(self._encode_module(mode, "Start", 1))
         i = 1
-        for c in self.contents:
-            self.encode_module(c, i)
+        for c in contents:
+            bar_elements.extend(self._encode_module(mode, c, i))
             i += 1
-        self.add_mod()
-        self.encode_module("Stop", 0)
-        self.add_quiet()
+        bar_elements.extend(self._get_mod())
+        bar_elements.extend(self._encode_module(mode, "Stop", 1))
+        bar_elements.append(self._get_quiet())
+        return bar_elements
 
-    def translate_to_image(self):
+    def _translate_to_image(self, bar_elements):
         all_weights = 0
-        for m in self.bar_elements:
+        for m in bar_elements:
             all_weights += m['width']
         si = CandyBarImage(all_weights, int(all_weights * 0.15))
-        scale = 1.0
-        for m in self.bar_elements:
-            pixels = int(m['width'] * scale)
+        for m in bar_elements:
+            pixels = int(m['width'] * self._scale)
             if m['flip'] == 1:
                 si.add_bar(pixels)
             else:
                 si.add_space(pixels)
-
-        self.image_byte_array = si.scale_and_convert_to_byte_array(self.width, self.height)
+        return si.scale_and_convert_to_byte_array(self._width, self._height)

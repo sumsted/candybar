@@ -22,9 +22,15 @@ class TestCandyBar39(TestCase):
         of.close()
 
     def test_generate_barcode_with_contents(self):
-        cb128 = CandyBar39('', 400, 60)
-        bs = cb128.generate_barcode_with_contents('A')
+        cb39 = CandyBar39('', 400, 60)
+        bs = cb39.generate_barcode_with_contents('ABCDEFG')
+        self.write_file('./test_code_39_1.png', bs)
+        bs = cb39.generate_barcode_with_contents('1234567890')
         self.write_file('./test_code_39_2.png', bs)
+        bs = cb39.generate_barcode_with_contents('HIJKLMNOPQRSTU')
+        self.write_file('./test_code_39_3.png', bs)
+        bs = cb39.generate_barcode_with_contents('UVWXYZ-. $/+%')
+        self.write_file('./test_code_39_4.png', bs)
         # self.assertEqual("1810affbf4bb715df8281d8fd50a149530e5a16b39263b5b7682107a",
         #                  self.sha2_check(bs),
         #                  "Unable to generate barcode")

@@ -1,7 +1,7 @@
 from candybar.CandyBarImagePdf417 import CandyBarImagePdf417
 from candybar.PatternPdf417 import PatternPdf417
 
-# TODO clean up into testable units
+# TODO clean up into testable units, fails class test - 2 methods and one is __init__() :P
 
 
 class CandyBarPdf417:
