@@ -45,9 +45,9 @@ class CandyBar39:
     def generate_barcode_with_contents(self, contents):
         self._reset()
         self._contents = contents
-        return self._generate_barcode()
+        return self.generate_barcode()
 
-    def _generate_barcode(self):
+    def generate_barcode(self):
         self._determine_type(self._contents)
         bar_elements = self._create_bar_elements(self._contents)
         image_byte_array = self._translate_to_image(bar_elements)
