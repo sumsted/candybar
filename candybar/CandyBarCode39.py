@@ -75,10 +75,8 @@ class CandyBar39:
                 all_weights += (int(m) + 1)
             all_weights += 1
         candy_bar_image = CandyBarImage(all_weights, int(all_weights * 0.15), self.IMAGE_TYPE)
-        # TODO: hmm
         candy_bar_image.add_space(self.QUIET_ZONE * self._scale)
         for p in bar_elements:
-            print(p)
             black = True
             for m in p:
                 pixels = (int(m) + 1) * self._scale

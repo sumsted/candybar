@@ -7,6 +7,9 @@ Ported to Python 3.4
 Pillow==2.8.1
 ```
 
+### Code39
+![Code128](/tests/test3.png)
+
 ### Code128
 ![Code128](/tests/test1.png)
 
